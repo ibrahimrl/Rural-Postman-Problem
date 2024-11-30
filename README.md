@@ -11,11 +11,13 @@ This project provides a solver for the **Rural Postman Problem (RPP)** using **S
   - [Introduction](#introduction)
   - [Prerequisites](#prerequisites)
   - [Setup Instructions](#setup-instructions)
-    - [1. Install Glucose SAT Solver](#1-install-glucose-sat-solver)
-    - [2. Modify Glucose Source Code](#2-modify-glucose-source-code)
+    - [1. Clone the repository:](#1-clone-the-repository)
+    - [2. Navigate to the project directory:](#2-navigate-to-the-project-directory)
+    - [3. Install Glucose SAT Solver](#3-install-glucose-sat-solver)
+    - [4. Modify Glucose Source Code](#4-modify-glucose-source-code)
       - [**Steps to Modify `Main.cc`:**](#steps-to-modify-maincc)
-    - [3. Compile Glucose](#3-compile-glucose)
-    - [4. Update Solver Path in Script](#4-update-solver-path-in-script)
+    - [5. Compile Glucose](#5-compile-glucose)
+    - [6. Update Solver Path in Script](#6-update-solver-path-in-script)
   - [Usage](#usage)
     - [Running the Solver](#running-the-solver)
   - [Code Structure](#code-structure)
@@ -43,7 +45,18 @@ This project implements a solver for the RPP by:
 
 ## Setup Instructions
 
-### 1. Install Glucose SAT Solver
+### 1. Clone the repository:
+   
+  ```bash
+  git clone git@github.com:ibrahimrl/Rural-Postman-Problem.git
+  ```
+  
+### 2. Navigate to the project directory:
+   ```bash
+    cd Rural-Postman-Problem
+   ```
+
+### 3. Install Glucose SAT Solver
 
 Download the Glucose SAT solver source code:
 
@@ -52,7 +65,7 @@ git clone https://github.com/audemard/glucose.git
 ```
 
 
-### 2. Modify Glucose Source Code
+### 4. Modify Glucose Source Code
 
 To ensure that Glucose outputs the model (variable assignments) when a solution is found, you need to modify the `Main.cc` file in the Glucose source code.
 
@@ -91,7 +104,7 @@ To ensure that Glucose outputs the model (variable assignments) when a solution 
 
 4. **Modify the Code to Always Print the Model:**
 
-    Replace the above code block with:
+    Press `i` and replace the above code block with:
 
 
     ```bash
@@ -112,7 +125,7 @@ To ensure that Glucose outputs the model (variable assignments) when a solution 
 
     If you use `vim`, press `ESC` then type `:x`.
 
-### 3. Compile Glucose
+### 5. Compile Glucose
 
   After modifying the source code, compile the Glucose solver. Make sure you are still inside the `simp` direcotry.
 
@@ -137,7 +150,7 @@ To ensure that Glucose outputs the model (variable assignments) when a solution 
       chmod +x glucose_release
       ```
 
-### 4. Update Solver Path in Script
+### 6. Update Solver Path in Script
 
   In the `rural_postman.py` script, update the `solver_path` variable to point to the compiled Glucose executable.
 
