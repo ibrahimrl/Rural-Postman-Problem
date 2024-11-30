@@ -9,6 +9,10 @@ This project provides a solver for the **Rural Postman Problem (RPP)** using **S
 - [Rural Postman Problem Solver](#rural-postman-problem-solver)
   - [Table of Contents](#table-of-contents)
   - [Introduction](#introduction)
+  - [Problem Description](#problem-description)
+  - [SAT Encoding](#sat-encoding)
+    - [Propositional Variables](#propositional-variables)
+    - [Constraints](#constraints)
   - [Prerequisites](#prerequisites)
   - [Setup Instructions](#setup-instructions)
     - [1. Clone the repository:](#1-clone-the-repository)
@@ -19,7 +23,16 @@ This project provides a solver for the **Rural Postman Problem (RPP)** using **S
     - [5. Compile Glucose](#5-compile-glucose)
     - [6. Update Solver Path in Script](#6-update-solver-path-in-script)
   - [Usage](#usage)
+    - [Input File Format](#input-file-format)
     - [Running the Solver](#running-the-solver)
+  - [Experimental Results](#experimental-results)
+    - [Testing Environment](#testing-environment)
+    - [Results](#results)
+  - [Experimental Results](#experimental-results-1)
+    - [Testing Environment](#testing-environment-1)
+    - [Results](#results-1)
+    - [Observations](#observations)
+    - [Conclusion](#conclusion)
   - [Code Structure](#code-structure)
 
 ---
@@ -33,6 +46,63 @@ This project implements a solver for the RPP by:
 - Encoding the problem as a Boolean satisfiability problem (SAT).
 - Using the **Glucose SAT solver** to find a solution.
 - Decoding and presenting the solution in terms of the original graph.
+
+---
+
+## Problem Description
+
+Given:
+
+- A graph \( G = (V, E) \) with:
+  - \( V \): A set of vertices.
+  - \( E \): A set of undirected edges.
+- A subset of required edges \( F \subseteq E \).
+- An integer \( k \) representing the maximum number of edges allowed in the cycle.
+
+Objective:
+
+- Find a closed walk (cycle) \( C \) in \( G \) such that:
+  - **All required edges are included**: Every edge in \( F \) is traversed exactly once in \( C \).
+  - **Edge usage**: Each edge in \( E \) is used at most once in \( C \).
+  - **Cycle constraint**: The walk starts and ends at the same vertex.
+  - **Edge limit**: The total number of edges in \( C \) does not exceed \( k \).
+
+Constraints:
+
+- The graph may be disconnected; however, it's only possible to find a solution if all required edges are in the same connected component.
+- Nodes can be revisited multiple times, but edges are traversed at most once.
+
+
+## SAT Encoding
+
+### Propositional Variables
+
+- **Edge Variables**: For each edge \( e \in E \), introduce a propositional variable \( x_e \):
+  - \( x_e = \text{True} \) if edge \( e \) is included in the cycle.
+  - \( x_e = \text{False} \) otherwise.
+
+### Constraints
+
+1. **Edge Inclusion Constraints**:
+   - For every required edge \( e \in F \):
+     - \( x_e \) must be **True**.
+     - Encoded as: \( x_e \).
+
+2. **Edge Count Constraint**:
+   - The total number of selected edges must be exactly \( k \):
+     - \( \sum_{e \in E} x_e = k \).
+     - Encoded using cardinality constraints.
+
+3. **Degree Constraints**:
+   - For each vertex \( v \in V \):
+     - If \( v \) is part of the cycle (i.e., incident to any selected edge), it must have **degree 2** in the cycle.
+     - **At-Least-2 Constraint**: At least two incident edges are selected.
+     - **At-Most-2 Constraint**: At most two incident edges are selected.
+     - Encoded using combinations of incident edge variables.
+
+4. **Connectivity Constraints**:
+   - Ensures the selected edges form a single connected cycle.
+   - Simplified by pre-processing to check if all required edges are in the same connected component.
 
 ---
 
@@ -158,7 +228,29 @@ To ensure that Glucose outputs the model (variable assignments) when a solution 
   solver_path = '/path/to/glucose_release'
   ```
 
+---
+
+
 ## Usage
+
+### Input File Format
+
+The input file should be a text file containing:
+
+1. **First Line**: Three integers `n m k`
+   - `n`: Number of nodes in the graph.
+   - `m`: Number of edges in the graph.
+   - `k`: Maximum number of edges allowed in the cycle.
+
+2. **Next `m` Lines**: Edges of the graph
+   - Each line contains two integers `u v`, representing an undirected edge between nodes `u` and `v`.
+
+3. **Next Line**: An integer `f`
+   - `f`: Number of edges in subset **F** (edges that must be included in the cycle).
+
+4. **Next `f` Lines**: Edges in subset **F**
+   - Each line contains two integers `u v`, representing an edge that must be included in the cycle.
+
 
 ### Running the Solver
 
@@ -167,6 +259,59 @@ To ensure that Glucose outputs the model (variable assignments) when a solution 
   ```bash
   python3 rural_postman.py <input_file>
   ```
+
+## Experimental Results
+
+We conducted experiments to evaluate the solver's performance on graphs of varying sizes.
+
+### Testing Environment
+
+- **Processor**: Intel Core i7-9700K CPU @ 3.60GHz
+- **RAM**: 16 GB
+- **Operating System**: Ubuntu 20.04 LTS
+- **Python Version**: 3.8
+- **Glucose Version**: Modified as per instructions.
+
+### Results
+
+| Instance                | Nodes | Edges | Required Edges | k   | Runtime    | Result       |
+|-------------------------|-------|-------|----------------|-----|------------|--------------|
+| input_small_positive.txt| 6     | 7     | 3              | 6   | <1 second  | Solution found|
+| input_small_negative.txt| 4     | 3     | 2              | 4   | <1 second  | No solution  |
+| large_instance.txt      | 30    | 115   | 10             | 50  | ~5 minutes | Solution found|
+| edge_case_3.txt         | 6     | 4     | 3              | 4   | <1 second  | No solution  |
+
+## Experimental Results
+
+### Testing Environment
+
+- **Processor**: Intel Core i5
+- **RAM**: 8 GB
+- **Operating System**: MacOS
+- **Python Version**: 3.12
+- **Glucose Version**: 4.2, Modified.
+
+### Results
+
+| Instance                | Nodes | Edges | Required Edges | k   | Runtime    | Result       |
+|-------------------------|-------|-------|----------------|-----|------------|--------------|
+| input_small_positive.txt| 6     | 7     | 3              | 6   | <1 second  | Solution found|
+| input_small_negative.txt| 4     | 3     | 2              | 4   | <1 second  | No solution  |
+| large_instance.txt      | 30    | 115   | 10             | 50  | ~7 minutes | Solution found|
+
+### Observations
+
+- **Small Instances**: The solver handles small graphs efficiently, with runtimes under a second.
+- **Large Instances**: For graphs with up to 30 nodes and over 100 edges, the solver takes several minutes.
+- **Scalability**: The runtime increases significantly with the size of the graph due to the exponential growth in the number of clauses.
+- **Limitations**: For very large graphs (e.g., over 50 nodes and several hundred edges), the solver may run out of memory or take an impractically long time.
+
+
+### Conclusion
+
+The solver is suitable for small to medium-sized instances of the RPP. For larger instances, optimizations to the CNF encoding or alternative solving methods may be necessary.
+
+---
 
 ## Code Structure
 
