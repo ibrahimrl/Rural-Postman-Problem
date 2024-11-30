@@ -28,9 +28,6 @@ This project provides a solver for the **Rural Postman Problem (RPP)** using **S
   - [Experimental Results](#experimental-results)
     - [Testing Environment](#testing-environment)
     - [Results](#results)
-  - [Experimental Results](#experimental-results-1)
-    - [Testing Environment](#testing-environment-1)
-    - [Results](#results-1)
     - [Observations](#observations)
     - [Conclusion](#conclusion)
   - [Code Structure](#code-structure)
@@ -53,54 +50,69 @@ This project implements a solver for the RPP by:
 
 Given:
 
-- A graph \( G = (V, E) \) with:
-  - \( V \): A set of vertices.
-  - \( E \): A set of undirected edges.
-- A subset of required edges \( F \subseteq E \).
-- An integer \( k \) representing the maximum number of edges allowed in the cycle.
+- A graph $G = (V, E)$ with:
+  - $V$: A set of vertices.
+  - $E$: A set of undirected edges.
+- A subset of required edges $F \subseteq E$.
+- An integer $k$ representing the maximum number of edges allowed in the cycle.
 
-Objective:
+**Objective:**
 
-- Find a closed walk (cycle) \( C \) in \( G \) such that:
-  - **All required edges are included**: Every edge in \( F \) is traversed exactly once in \( C \).
-  - **Edge usage**: Each edge in \( E \) is used at most once in \( C \).
-  - **Cycle constraint**: The walk starts and ends at the same vertex.
-  - **Edge limit**: The total number of edges in \( C \) does not exceed \( k \).
+Find a closed walk (cycle) $C$ in $G$ such that:
 
-Constraints:
+- **All required edges are included**: Every edge in $F$ is traversed exactly once in $C$.
+- **Edge usage**: Each edge in $E$ is used at most once in $C$.
+- **Cycle constraint**: The walk starts and ends at the same vertex.
+- **Edge limit**: The total number of edges in $C$ does not exceed $k$.
+
+**Constraints:**
 
 - The graph may be disconnected; however, it's only possible to find a solution if all required edges are in the same connected component.
 - Nodes can be revisited multiple times, but edges are traversed at most once.
 
+---
 
 ## SAT Encoding
 
 ### Propositional Variables
 
-- **Edge Variables**: For each edge \( e \in E \), introduce a propositional variable \( x_e \):
-  - \( x_e = \text{True} \) if edge \( e \) is included in the cycle.
-  - \( x_e = \text{False} \) otherwise.
+- **Edge Variables**: For each edge $e \in E$, introduce a propositional variable $x_e$:
+  - $x_e = \text{True}$ if edge $e$ is included in the cycle.
+  - $x_e = \text{False}$ otherwise.
 
 ### Constraints
 
 1. **Edge Inclusion Constraints**:
-   - For every required edge \( e \in F \):
-     - \( x_e \) must be **True**.
-     - Encoded as: \( x_e \).
+
+   - For every required edge $e \in F$:
+     - $x_e$ must be **True**.
+     - Encoded as: $x_e$.
 
 2. **Edge Count Constraint**:
-   - The total number of selected edges must be exactly \( k \):
-     - \( \sum_{e \in E} x_e = k \).
-     - Encoded using cardinality constraints.
+
+   - The total number of selected edges must be exactly $k$:
+     - $$ \sum_{e \in E} x_e = k. $$
+
+   - Encoded using cardinality constraints.
 
 3. **Degree Constraints**:
-   - For each vertex \( v \in V \):
-     - If \( v \) is part of the cycle (i.e., incident to any selected edge), it must have **degree 2** in the cycle.
-     - **At-Least-2 Constraint**: At least two incident edges are selected.
-     - **At-Most-2 Constraint**: At most two incident edges are selected.
-     - Encoded using combinations of incident edge variables.
+
+   - For each vertex $v \in V$:
+     - If $v$ is part of the cycle (i.e., incident to any selected edge), it must have **degree 2** in the cycle.
+
+     - **At-Least-2 Constraint**:
+       - At least two incident edges are selected.
+       - Encoded as:
+         - For each vertex $v$ with incident edges $\{ x_{e_1}, x_{e_2}, \dots, x_{e_n} \}$:
+           - $$ \sum_{i=1}^{n} x_{e_i} \geq 2. $$
+
+     - **At-Most-2 Constraint**:
+       - At most two incident edges are selected.
+       - Encoded as:
+         - $$ \sum_{i=1}^{n} x_{e_i} \leq 2. $$
 
 4. **Connectivity Constraints**:
+
    - Ensures the selected edges form a single connected cycle.
    - Simplified by pre-processing to check if all required edges are in the same connected component.
 
@@ -262,26 +274,6 @@ The input file should be a text file containing:
 
 ## Experimental Results
 
-We conducted experiments to evaluate the solver's performance on graphs of varying sizes.
-
-### Testing Environment
-
-- **Processor**: Intel Core i7-9700K CPU @ 3.60GHz
-- **RAM**: 16 GB
-- **Operating System**: Ubuntu 20.04 LTS
-- **Python Version**: 3.8
-- **Glucose Version**: Modified as per instructions.
-
-### Results
-
-| Instance                | Nodes | Edges | Required Edges | k   | Runtime    | Result       |
-|-------------------------|-------|-------|----------------|-----|------------|--------------|
-| input_small_positive.txt| 6     | 7     | 3              | 6   | <1 second  | Solution found|
-| input_small_negative.txt| 4     | 3     | 2              | 4   | <1 second  | No solution  |
-| large_instance.txt      | 30    | 115   | 10             | 50  | ~5 minutes | Solution found|
-| edge_case_3.txt         | 6     | 4     | 3              | 4   | <1 second  | No solution  |
-
-## Experimental Results
 
 ### Testing Environment
 
