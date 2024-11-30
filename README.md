@@ -48,7 +48,7 @@ This project implements a solver for the RPP by:
 ### 1. Clone the repository:
    
   ```bash
-  git clone git@github.com:ibrahimrl/Rural-Postman-Problem.git
+  git clone https://github.com/ibrahimrl/Rural-Postman-Problem.git
   ```
   
 ### 2. Navigate to the project directory:
