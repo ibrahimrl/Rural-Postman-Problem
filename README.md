@@ -91,7 +91,9 @@ Find a closed walk (cycle) $C$ in $G$ such that:
 2. **Edge Count Constraint**:
 
    - The total number of selected edges must be exactly $k$:
-     - $$ \sum_{e \in E} x_e = k. $$
+    - $$
+      \sum_{e \in E} x_e = k.
+      $$
 
    - Encoded using cardinality constraints.
 
@@ -104,12 +106,16 @@ Find a closed walk (cycle) $C$ in $G$ such that:
        - At least two incident edges are selected.
        - Encoded as:
          - For each vertex $v$ with incident edges $\{ x_{e_1}, x_{e_2}, \dots, x_{e_n} \}$:
-           - $$ \sum_{i=1}^{n} x_{e_i} \geq 2. $$
+            - $$
+              \sum_{i=1}^{n} x_{e_i} \geq 2.
+              $$
 
      - **At-Most-2 Constraint**:
        - At most two incident edges are selected.
        - Encoded as:
-         - $$ \sum_{i=1}^{n} x_{e_i} \leq 2. $$
+        - $$
+          \sum_{i=1}^{n} x_{e_i} \leq 2.
+          $$
 
 4. **Connectivity Constraints**:
 
